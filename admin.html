@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDUSparks Admin Portal</title>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --primary:#4f46e5;
+            --primary-dark:#3730a3;
+            --primary-soft:#eef2ff;
+            --secondary:#0ea5e9;
+            --success:#10b981;
+            --warning:#f59e0b;
+            --danger:#ef4444;
+            --bg:#f8fafc;
+            --surface:#ffffff;
+            --surface-soft:#f1f5f9;
+            --text:#0f172a;
+            --muted:#64748b;
+            --border:#e2e8f0;
+            --sidebar:#0b1120;
+            --sidebar-soft:#111827;
+            --radius:18px;
+            --shadow:0 18px 45px rgba(15, 23, 42, .08);
+            --font:'Inter','Segoe UI',system-ui,sans-serif;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:var(--font);background:radial-gradient(circle at top left,#e0e7ff 0,#f8fafc 32%,#f8fafc 100%);color:var(--text);min-height:100vh;}
+        button,input,select,textarea{font-family:inherit}
+        button{border:0;cursor:pointer;font-weight:800;transition:.25s ease}
+        button:disabled{opacity:.55;cursor:not-allowed}
+        input,select,textarea{width:100%;border:1px solid var(--border);background:#fff;border-radius:12px;padding:12px 14px;outline:none;color:var(--text);transition:.25s ease}
+        input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(79,70,229,.12)}
+        label{display:block;font-size:.86rem;font-weight:800;margin-bottom:7px;color:#334155}
+        a{color:inherit;text-decoration:none}
+        .auth-screen{min-height:100vh;display:grid;place-items:center;padding:24px}
+        .auth-shell{width:min(1050px,100%);display:grid;grid-template-columns:1.15fr .85fr;background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.8);box-shadow:var(--shadow);border-radius:30px;overflow:hidden;backdrop-filter:blur(18px)}
+        .auth-hero{padding:50px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;position:relative;overflow:hidden}
+        .auth-hero:before,.auth-hero:after{content:"";position:absolute;border-radius:999px;background:rgba(255,255,255,.16)}
+        .auth-hero:before{width:260px;height:260px;right:-80px;top:-60px}.auth-hero:after{width:180px;height:180px;left:-70px;bottom:-40px}
+        .logo-pill{position:relative;z-index:1;display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);padding:12px 16px;border-radius:999px;font-weight:900;margin-bottom:50px}
+        .auth-hero h1{position:relative;z-index:1;font-size:3rem;line-height:1;letter-spacing:-1px;margin-bottom:18px}
+        .auth-hero p{position:relative;z-index:1;font-size:1.08rem;line-height:1.7;opacity:.95;max-width:540px}
+        .mini-stats{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:45px}
+        .mini-stat{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:16px}.mini-stat strong{display:block;font-size:1.45rem}.mini-stat span{font-size:.82rem;opacity:.9}
+        .auth-card{padding:46px 42px;display:flex;flex-direction:column;justify-content:center;background:#fff}
+        .auth-card h2{font-size:2rem;margin-bottom:8px}.auth-card p{color:var(--muted);line-height:1.6;margin-bottom:24px}
+        .form-row{margin-bottom:15px}.password-wrap{position:relative}.password-wrap button{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;background:var(--surface-soft);color:var(--muted)}
+        .btn-primary{width:100%;padding:14px 18px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;box-shadow:0 12px 25px rgba(79,70,229,.22)}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 18px 30px rgba(79,70,229,.28)}
+        .btn-outline{width:100%;padding:13px 18px;border-radius:14px;background:white;border:2px solid var(--primary);color:var(--primary);margin-top:10px}.btn-outline:hover{background:var(--primary-soft)}
+        .auth-help{font-size:.86rem;color:var(--muted);margin-top:18px;line-height:1.6}.auth-help code{background:#f1f5f9;padding:2px 6px;border-radius:6px;color:#334155}
+        .app{display:none;min-height:100vh}.app.active{display:grid;grid-template-columns:280px 1fr}.sidebar{background:linear-gradient(180deg,#0b1120,#111827);color:white;padding:24px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}.brand{display:flex;align-items:center;gap:12px;padding:8px 6px 24px;border-bottom:1px solid rgba(255,255,255,.08)}.brand-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--secondary));font-size:1.5rem}.brand strong{font-size:1.1rem}.brand span{display:block;color:#94a3b8;font-size:.78rem;margin-top:2px}
+        .nav{display:flex;flex-direction:column;gap:8px;margin-top:26px;flex:1}.nav-link{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;color:#cbd5e1;font-weight:750;cursor:pointer}.nav-link:hover,.nav-link.active{background:rgba(79,70,229,.22);color:white}.nav-link i{font-size:1.25rem}.sidebar-footer{display:flex;flex-direction:column;gap:8px;padding-top:18px;border-top:1px solid rgba(255,255,255,.08)}
+        .main{min-width:0;display:flex;flex-direction:column}.topbar{height:78px;background:rgba(255,255,255,.82);backdrop-filter:blur(14px);border-bottom:1px solid rgba(226,232,240,.8);display:flex;align-items:center;justify-content:space-between;padding:0 34px;position:sticky;top:0;z-index:50}.topbar-left h2{font-size:1.3rem}.topbar-left p{color:var(--muted);font-size:.9rem;margin-top:3px}.admin-chip{display:flex;align-items:center;gap:12px;background:white;border:1px solid var(--border);padding:10px 14px;border-radius:999px;box-shadow:0 8px 25px rgba(15,23,42,.05)}.admin-avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary),var(--secondary));color:white;font-weight:900}.admin-chip small{display:block;color:var(--muted);font-size:.72rem}.mobile-menu{display:none;background:var(--primary);color:white;width:42px;height:42px;border-radius:12px;font-size:1.3rem}
+        .content{padding:34px}.page{display:none}.page.active{display:block;animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+        .grid{display:grid;gap:20px}.stats-grid{grid-template-columns:repeat(4,minmax(160px,1fr));margin-bottom:24px}.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:0 12px 32px rgba(15,23,42,.04)}.stat-card{position:relative;overflow:hidden}.stat-card:after{content:"";position:absolute;right:-35px;top:-35px;width:120px;height:120px;border-radius:999px;background:var(--primary-soft)}.stat-card .icon{position:relative;z-index:1;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--primary-soft);color:var(--primary);font-size:1.45rem;margin-bottom:14px}.stat-card h3{position:relative;z-index:1;font-size:2rem}.stat-card p{position:relative;z-index:1;color:var(--muted);font-weight:700;font-size:.9rem}.stat-card.success .icon{background:#dcfce7;color:#059669}.stat-card.warning .icon{background:#fef3c7;color:#d97706}.stat-card.danger .icon{background:#fee2e2;color:#dc2626}
+        .section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}.section-head h1{font-size:2rem;letter-spacing:-.5px}.section-head p{color:var(--muted);margin-top:5px}.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.btn{width:auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 15px;border-radius:12px;background:var(--primary);color:white}.btn:hover{transform:translateY(-1px);filter:brightness(1.04)}.btn.secondary{background:#334155}.btn.success{background:var(--success)}.btn.warning{background:var(--warning)}.btn.danger{background:var(--danger)}.btn.ghost{background:white;color:var(--text);border:1px solid var(--border)}.btn.soft{background:var(--primary-soft);color:var(--primary)}.btn.small{padding:7px 10px;border-radius:10px;font-size:.82rem}.toolbar{display:grid;grid-template-columns:1.4fr .6fr .6fr auto;gap:12px;margin-bottom:16px}.table-wrap{overflow:auto;border-radius:16px;border:1px solid var(--border)}table{width:100%;border-collapse:collapse;min-width:780px;background:white}th,td{padding:14px 16px;text-align:left;border-bottom:1px solid #f1f5f9;vertical-align:middle}th{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:#f8fafc}tr:hover td{background:#f8fafc}.resource-title{font-weight:900;color:#1e293b}.muted{color:var(--muted)}.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:.75rem;font-weight:900;background:#f1f5f9;color:#475569}.badge.green{background:#dcfce7;color:#047857}.badge.red{background:#fee2e2;color:#b91c1c}.badge.blue{background:#dbeafe;color:#1d4ed8}.badge.amber{background:#fef3c7;color:#b45309}.badge.purple{background:#ede9fe;color:#6d28d9}.two-col{grid-template-columns:1fr 1fr}.three-col{grid-template-columns:repeat(3,1fr)}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form-grid .full{grid-column:1/-1}.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}.modal-backdrop.active{display:flex}.modal{background:white;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,.24);width:min(760px,100%);max-height:90vh;overflow:hidden;display:flex;flex-direction:column}.modal-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px;border-bottom:1px solid var(--border)}.modal-head h2{font-size:1.35rem}.modal-body{padding:24px;overflow:auto}.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:18px 24px;background:#f8fafc;border-top:1px solid var(--border)}.close-btn{background:#f1f5f9;color:#475569;width:40px;height:40px;border-radius:50%;font-size:1.2rem}.toast{position:fixed;left:50%;bottom:-90px;transform:translateX(-50%);background:#0f172a;color:white;padding:14px 18px;border-radius:999px;font-weight:800;box-shadow:0 20px 40px rgba(15,23,42,.25);z-index:2000;display:flex;gap:10px;align-items:center;transition:.35s ease}.toast.show{bottom:28px}.empty{padding:40px;text-align:center;color:var(--muted)}.mini-chart{display:grid;gap:12px}.bar-row{display:grid;grid-template-columns:130px 1fr 42px;gap:12px;align-items:center}.bar-track{height:12px;background:#e2e8f0;border-radius:999px;overflow:hidden}.bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--secondary));border-radius:999px}.message-card{border:1px solid var(--border);border-radius:16px;padding:18px;background:white;margin-bottom:12px;display:grid;grid-template-columns:1fr auto;gap:14px}.message-card.unread{border-left:5px solid var(--primary);background:#f8fbff}.message-card h3{font-size:1rem;margin-bottom:5px}.switch{position:relative;display:inline-block;width:52px;height:28px}.switch input{display:none}.slider{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;border-radius:999px;transition:.25s}.slider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;background:white;border-radius:50%;transition:.25s;box-shadow:0 2px 8px rgba(0,0,0,.18)}.switch input:checked+.slider{background:var(--primary)}.switch input:checked+.slider:before{transform:translateX(24px)}
+        .danger-zone{border:1px solid #fecaca;background:#fff7f7}.help-box{padding:15px;border-radius:14px;background:#f8fafc;border:1px dashed #cbd5e1;color:var(--muted);line-height:1.6;font-size:.92rem}.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:1px 6px;color:#334155;font-size:.82em}
+        @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr)}.toolbar{grid-template-columns:1fr 1fr}.two-col,.three-col{grid-template-columns:1fr}.auth-shell{grid-template-columns:1fr}.auth-hero{display:none}}
+        @media(max-width:800px){.app.active{grid-template-columns:1fr}.sidebar{position:fixed;z-index:80;left:-310px;transition:.3s;width:280px}.sidebar.open{left:0}.mobile-menu{display:grid;place-items:center}.topbar{padding:0 18px}.content{padding:22px}.stats-grid{grid-template-columns:1fr}.form-grid,.toolbar{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}.mini-stats{grid-template-columns:1fr}.auth-card{padding:34px 24px}}
+    </style>
+</head>
+<body>
+    <section id="authScreen" class="auth-screen">
+        <div class="auth-shell">
+            <div class="auth-hero">
+                <div class="logo-pill"><i class="ph-fill ph-sparkle"></i> EDUSparks Staff Portal</div>
+                <h1>Admin control made simple.</h1>
+                <p>Manage learning resources, MARC records, students, feedback, and system settings in one interactive prototype dashboard.</p>
+                <div class="mini-stats">
+                    <div class="mini-stat"><strong id="authMiniUsers">0</strong><span>Registered users</span></div>
+                    <div class="mini-stat"><strong id="authMiniResources">0</strong><span>Resources</span></div>
+                    <div class="mini-stat"><strong id="authMiniFeedback">0</strong><span>Feedback items</span></div>
+                </div>
+            </div>
+            <div class="auth-card">
+                <h2 id="authTitle">Staff Access Only</h2>
+                <p id="authSub">Sign in with a registered EDUSparks admin account.</p>
+                <form id="adminAuthForm">
+                    <div class="form-row" id="nameRow" style="display:none">
+                        <label>Full Name</label>
+                        <input type="text" id="adminName" placeholder="Example: Nurul Admin">
+                    </div>
+                    <div class="form-row">
+                        <label>Staff Email</label>
+                        <input type="email" id="adminEmail" placeholder="admin@edusparks.my" required>
+                    </div>
+                    <div class="form-row">
+                        <label>Password</label>
+                        <div class="password-wrap">
+                            <input type="password" id="adminPassword" placeholder="Minimum 6 characters" required>
+                            <button type="button" onclick="togglePassword('adminPassword', this)" aria-label="Show password"><i class="ph ph-eye"></i></button>
+                        </div>
+                    </div>
+                    <button class="btn-primary" type="submit" id="authSubmitBtn"><i class="ph ph-sign-in"></i> Login to Dashboard</button>
+                    <button class="btn-outline" type="button" onclick="toggleRegisterMode()" id="authToggleBtn">Register New Admin</button>
+                </form>
+                <div class="auth-help">
+                    Admin registration is restricted to <code>@edusparks.my</code>. This prototype stores accounts locally in your browser.
+                </div>
+                <a href="index.html" style="display:inline-flex;gap:8px;align-items:center;margin-top:18px;color:var(--muted);font-weight:800"><i class="ph ph-arrow-left"></i> Back to EDL Website</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="app" class="app">
+        <aside id="sidebar" class="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><i class="ph-fill ph-sparkle"></i></div>
+                <div><strong>EDUSparks</strong><span>Admin Dashboard</span></div>
+            </div>
+            <nav class="nav">
+                <a class="nav-link active" data-page="dashboard" onclick="showPage('dashboard', this)"><i class="ph ph-gauge"></i> Dashboard</a>
+                <a class="nav-link" data-page="collections" onclick="showPage('collections', this)"><i class="ph ph-books"></i> Manage Collections</a>
+                <a class="nav-link" data-page="users" onclick="showPage('users', this)"><i class="ph ph-users"></i> User Management</a>
+                <a class="nav-link" data-page="messages" onclick="showPage('messages', this)"><i class="ph ph-envelope"></i> Messages / Feedback</a>
+                <a class="nav-link" data-page="profile" onclick="showPage('profile', this)"><i class="ph ph-user-circle"></i> Admin Profile</a>
+                <a class="nav-link" data-page="settings" onclick="showPage('settings', this)"><i class="ph ph-gear"></i> Settings</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" class="nav-link"><i class="ph ph-globe"></i> Back to EDL</a>
+                <a onclick="adminLogout()" class="nav-link" style="color:#fca5a5"><i class="ph ph-sign-out"></i> Logout</a>
+            </div>
+        </aside>
+        <main class="main">
+            <header class="topbar">
+                <button class="mobile-menu" onclick="toggleSidebar()"><i class="ph ph-list"></i></button>
+                <div class="topbar-left">
+                    <h2 id="pageTitle">Dashboard</h2>
+                    <p id="pageHint">Overview of EDUSparks Digital Library activity.</p>
+                </div>
+                <div class="admin-chip">
+                    <div class="admin-avatar" id="adminAvatar">A</div>
+                    <div><strong id="topAdminName">Admin</strong><small id="topAdminEmail">admin@edusparks.my</small></div>
+                </div>
+            </header>
+            <div class="content">
+                <section id="page-dashboard" class="page active">
+                    <div class="section-head">
+                        <div><h1>Admin Command Center</h1><p>Live prototype data from browser storage.</p></div>
+                        <div class="actions"><button class="btn soft" onclick="seedSampleData()"><i class="ph ph-database"></i> Seed Sample Data</button><button class="btn ghost" onclick="exportAllData()"><i class="ph ph-download-simple"></i> Export JSON</button></div>
+                    </div>
+                    <div class="grid stats-grid">
+                        <div class="card stat-card"><div class="icon"><i class="ph ph-users"></i></div><h3 id="statUsers">0</h3><p>Total Users</p></div>
+                        <div class="card stat-card success"><div class="icon"><i class="ph ph-books"></i></div><h3 id="statResources">0</h3><p>Resources</p></div>
+                        <div class="card stat-card warning"><div class="icon"><i class="ph ph-clock"></i></div><h3 id="statReadLater">0</h3><p>Read Later Saves</p></div>
+                        <div class="card stat-card danger"><div class="icon"><i class="ph ph-envelope-open"></i></div><h3 id="statUnread">0</h3><p>Unread Feedback</p></div>
+                    </div>
+                    <div class="grid two-col">
+                        <div class="card">
+                            <h3 style="margin-bottom:16px">Resources by Zone</h3>
+                            <div id="zoneChart" class="mini-chart"></div>
+                        </div>
+                        <div class="card">
+                            <h3 style="margin-bottom:16px">Quick Actions</h3>
+                            <div class="actions" style="margin-bottom:16px">
+                                <button class="btn success" onclick="openResourceModal()"><i class="ph ph-plus"></i> Add Resource</button>
+                                <button class="btn" onclick="showPage('users', document.querySelector('[data-page=users]'))"><i class="ph ph-user-plus"></i> Manage Users</button>
+                                <button class="btn warning" onclick="addDemoFeedback()"><i class="ph ph-chat-circle-dots"></i> Add Demo Feedback</button>
+                            </div>
+                            <div class="help-box">This admin dashboard is functional for a frontend prototype. It uses <span class="kbd">localStorage</span>, so changes are saved in the same browser. For a real production system, it still needs a backend database and secure server authentication.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="page-collections" class="page">
+                    <div class="section-head">
+                        <div><h1>Manage Collections</h1><p>Add, edit, delete, search, and update MARC 21 metadata.</p></div>
+                        <div class="actions"><button class="btn success" onclick="openResourceModal()"><i class="ph ph-plus"></i> Add New Resource</button><button class="btn ghost" onclick="resetResources()"><i class="ph ph-arrow-counter-clockwise"></i> Reset Sample</button></div>
+                    </div>
+                    <div class="card toolbar">
+                        <input id="resourceSearch" type="text" placeholder="Search title, author, subject, ISBN..." oninput="renderResources()">
+                        <select id="hubFilter" onchange="renderResources()"><option value="all">All Zones</option><option value="early">Early Hub</option><option value="primary">Primary Zone</option><option value="secondary">Secondary Portal</option><option value="multimedia">Multimedia</option></select>
+                        <select id="typeFilter" onchange="renderResources()"><option value="all">All Types</option><option>Comic</option><option>Picture Book</option><option>Game</option><option>Notes</option><option>Virtual Lab</option><option>Video</option></select>
+                        <button class="btn" onclick="renderResources()"><i class="ph ph-magnifying-glass"></i> Search</button>
+                    </div>
+                    <div class="table-wrap"><table><thead><tr><th>Resource</th><th>Zone</th><th>Type</th><th>MARC Summary</th><th>Status</th><th>Actions</th></tr></thead><tbody id="resourcesTable"></tbody></table></div>
+                </section>
+
+                <section id="page-users" class="page">
+                    <div class="section-head">
+                        <div><h1>User Management</h1><p>Manage student accounts saved from the EDL website sign-up system.</p></div>
+                        <button class="btn" onclick="openUserModal()"><i class="ph ph-user-plus"></i> Add User</button>
+                    </div>
+                    <div class="grid three-col" style="margin-bottom:20px">
+                        <div class="card stat-card"><div class="icon"><i class="ph ph-student"></i></div><h3 id="userTotal">0</h3><p>Total Students</p></div>
+                        <div class="card stat-card success"><div class="icon"><i class="ph ph-check-circle"></i></div><h3 id="userActive">0</h3><p>Active Users</p></div>
+                        <div class="card stat-card danger"><div class="icon"><i class="ph ph-prohibit"></i></div><h3 id="userBanned">0</h3><p>Banned Users</p></div>
+                    </div>
+                    <div class="card toolbar" style="grid-template-columns:1fr .45fr auto">
+                        <input id="userSearch" placeholder="Search student name or email..." oninput="renderUsers()">
+                        <select id="userStatusFilter" onchange="renderUsers()"><option value="all">All Status</option><option value="active">Active</option><option value="banned">Banned</option></select>
+                        <button class="btn ghost" onclick="renderUsers()"><i class="ph ph-magnifying-glass"></i> Filter</button>
+                    </div>
+                    <div class="table-wrap"><table><thead><tr><th>Student</th><th>Email</th><th>Joined</th><th>Status</th><th>Library Progress</th><th>Manage</th></tr></thead><tbody id="usersTable"></tbody></table></div>
+                </section>
+
+                <section id="page-messages" class="page">
+                    <div class="section-head">
+                        <div><h1>Messages & Feedback</h1><p>View, mark as read, reply note, or delete feedback.</p></div>
+                        <button class="btn warning" onclick="addDemoFeedback()"><i class="ph ph-plus"></i> Add Demo Feedback</button>
+                    </div>
+                    <div id="messagesList"></div>
+                </section>
+
+                <section id="page-profile" class="page">
+                    <div class="section-head"><div><h1>Admin Profile</h1><p>Edit your admin display details and password.</p></div></div>
+                    <div class="grid two-col">
+                        <div class="card" style="text-align:center">
+                            <div class="admin-avatar" id="profileBigAvatar" style="width:110px;height:110px;font-size:3rem;margin:0 auto 18px">A</div>
+                            <h2 id="profileNameView">Admin</h2>
+                            <p class="muted" id="profileEmailView">admin@edusparks.my</p>
+                            <span class="badge purple" style="margin-top:14px"><i class="ph ph-shield-check"></i> Super Administrator</span>
+                        </div>
+                        <div class="card">
+                            <form id="profileForm">
+                                <div class="form-grid">
+                                    <div><label>Full Name</label><input id="profileName" required></div>
+                                    <div><label>Staff Email</label><input id="profileEmail" type="email" required></div>
+                                    <div class="full"><label>Department</label><input id="profileDept" placeholder="IT & Library Management"></div>
+                                    <div><label>New Password</label><input id="profilePass" type="password" placeholder="Leave blank to keep current password"></div>
+                                    <div><label>Confirm Password</label><input id="profilePass2" type="password" placeholder="Repeat new password"></div>
+                                </div>
+                                <button class="btn" style="margin-top:18px" type="submit"><i class="ph ph-floppy-disk"></i> Save Profile</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="page-settings" class="page">
+                    <div class="section-head"><div><h1>System Settings</h1><p>Save organization preferences for this prototype.</p></div></div>
+                    <div class="grid two-col">
+                        <div class="card">
+                            <h3 style="margin-bottom:18px">Organization Info</h3>
+                            <form id="settingsForm">
+                                <div class="form-row"><label>Library Name</label><input id="setLibraryName"></div>
+                                <div class="form-row"><label>Contact Email</label><input id="setContactEmail" type="email"></div>
+                                <div class="form-row"><label>Support Phone</label><input id="setPhone"></div>
+                                <button class="btn" type="submit"><i class="ph ph-floppy-disk"></i> Save Changes</button>
+                            </form>
+                        </div>
+                        <div class="card">
+                            <h3 style="margin-bottom:18px">System Preferences</h3>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span><strong>Maintenance Mode</strong><br><small class="muted">Show admin warning banner</small></span><label class="switch"><input type="checkbox" id="setMaintenance" onchange="saveSettingsQuick()"><span class="slider"></span></label></div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><span><strong>Public Registration</strong><br><small class="muted">Allow new student accounts</small></span><label class="switch"><input type="checkbox" id="setPublicReg" onchange="saveSettingsQuick()"><span class="slider"></span></label></div>
+                            <div class="card danger-zone" style="box-shadow:none;margin-top:20px"><h3 style="color:#b91c1c;margin-bottom:8px">Danger Zone</h3><p class="muted" style="margin-bottom:14px">Reset only the admin prototype data in this browser.</p><button class="btn danger" onclick="clearPrototypeData()"><i class="ph ph-trash"></i> Clear Prototype Data</button></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </section>
+
+    <div id="resourceModal" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-head"><h2 id="resourceModalTitle">Add Resource</h2><button class="close-btn" onclick="closeModal('resourceModal')"><i class="ph ph-x"></i></button></div>
+            <form id="resourceForm">
+                <div class="modal-body">
+                    <input type="hidden" id="resId">
+                    <div class="form-grid">
+                        <div class="full"><label>Resource Title</label><input id="resTitle" required></div>
+                        <div><label>Zone</label><select id="resHub" required><option value="early">Early Hub</option><option value="primary">Primary Zone</option><option value="secondary">Secondary Portal</option><option value="multimedia">Multimedia</option></select></div>
+                        <div><label>Material Type</label><select id="resType" required><option>Comic</option><option>Picture Book</option><option>Game</option><option>Notes</option><option>Virtual Lab</option><option>Video</option></select></div>
+                        <div><label>Age Group</label><input id="resAge" placeholder="Ages 6–9"></div>
+                        <div><label>Subject</label><input id="resSubject" placeholder="Science"></div>
+                        <div class="full"><label>Description</label><textarea id="resDesc" rows="3"></textarea></div>
+                        <div><label>ISBN / Identifier — MARC 020</label><input id="resIsbn"></div>
+                        <div><label>Dewey — MARC 082</label><input id="resDewey"></div>
+                        <div><label>Author — MARC 100</label><input id="resAuthor"></div>
+                        <div><label>Publication — MARC 260</label><input id="resPub"></div>
+                        <div class="full"><label>Source / URL</label><input id="resUrl" placeholder="https://..."></div>
+                        <div><label>Status</label><select id="resStatus"><option value="active">Active</option><option value="draft">Draft</option><option value="archived">Archived</option></select></div>
+                        <div><label>Action Button</label><input id="resAction" placeholder="Read Comic / Play Game / Open Notes"></div>
+                    </div>
+                </div>
+                <div class="modal-foot"><button type="button" class="btn ghost" onclick="closeModal('resourceModal')">Cancel</button><button class="btn success" type="submit"><i class="ph ph-floppy-disk"></i> Save Resource</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="userModal" class="modal-backdrop">
+        <div class="modal" style="width:min(560px,100%)">
+            <div class="modal-head"><h2 id="userModalTitle">Add User</h2><button class="close-btn" onclick="closeModal('userModal')"><i class="ph ph-x"></i></button></div>
+            <form id="userForm">
+                <div class="modal-body">
+                    <input type="hidden" id="userOriginalEmail">
+                    <div class="form-row"><label>Student Name</label><input id="userName" required></div>
+                    <div class="form-row"><label>Email</label><input id="userEmail" type="email" required></div>
+                    <div class="form-row"><label>Password</label><input id="userPassword" type="password" placeholder="Minimum 6 characters"></div>
+                    <div class="form-row"><label>Status</label><select id="userStatus"><option value="active">Active</option><option value="banned">Banned</option></select></div>
+                </div>
+                <div class="modal-foot"><button type="button" class="btn ghost" onclick="closeModal('userModal')">Cancel</button><button class="btn success" type="submit"><i class="ph ph-floppy-disk"></i> Save User</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="messageModal" class="modal-backdrop">
+        <div class="modal" style="width:min(650px,100%)">
+            <div class="modal-head"><h2>Feedback Details</h2><button class="close-btn" onclick="closeModal('messageModal')"><i class="ph ph-x"></i></button></div>
+            <div class="modal-body" id="messageModalBody"></div>
+            <div class="modal-foot"><button class="btn ghost" onclick="closeModal('messageModal')">Close</button><button class="btn" onclick="saveReplyNote()"><i class="ph ph-paper-plane-right"></i> Save Reply Note</button></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"><i class="ph-fill ph-check-circle"></i><span id="toastText">Saved</span></div>
+
+    <script>
+        const STORAGE = {
+            adminAccounts:'edusparksAdminAccountsV2',
+            adminSession:'edusparksAdminSessionV2',
+            users:'edusparksRegisteredAccountsV1',
+            resources:'edusparksAdminResourcesV2',
+            feedback:'edusparksFeedbackMessagesV1',
+            settings:'edusparksAdminSettingsV1',
+            library:'edusparksUserLibraryV2'
+        };
+        let isRegisterMode = false;
+        let currentAdmin = null;
+        let currentMessageId = null;
+
+        const sampleResources = [
+            {id:'R001', title:"Pepper & Carrot: The Dragon's Tooth", hub:'early', type:'Comic', age:'Ages 6–9', subject:'Reading', desc:'Creative Commons comic for early visual readers.', isbn:'CC-PEPPER-014', dewey:'741.5', author:'Revoy, David', pub:'Free Kids Books : Creative Commons, 2026', url:'https://freekidsbooks.org/pepper-and-carrot-episode-14-the-dragons-tooth/', status:'active', action:'Read Comic'},
+            {id:'R002', title:'Making Friends With Snakes', hub:'early', type:'Comic', age:'Ages 6–9', subject:'Nature', desc:'Nature comic about snake safety and animal awareness.', isbn:'CC-SNAKES-001', dewey:'597.96', author:'Pratham Books', pub:'StoryWeaver : Open Access, 2025', url:'https://freekidsbooks.org/making-friends-with-snakes-educational-nature-comic/', status:'active', action:'Read Comic'},
+            {id:'R003', title:'Phonics Pop Game', hub:'early', type:'Game', age:'Ages 6–9', subject:'Phonics', desc:'Simple letter-sound matching activity.', isbn:'GAME-PHONICS-001', dewey:'428.1', author:'EDUSparks Team', pub:'EDUSparks Digital Library, 2026', url:'', status:'active', action:'Play Game'},
+            {id:'R004', title:'Thunderbolt Kids Science Comic Grade 4', hub:'primary', type:'Comic', age:'Ages 10–12', subject:'Science', desc:'Visual science comic with short explanations.', isbn:'CC-TBK-G4', dewey:'507', author:'Siyavula', pub:'Siyavula : Creative Commons, 2025', url:'https://freekidsbooks.org/thunderbolt-kids-science-comic-books-grade-4/', status:'active', action:'Read Comic'},
+            {id:'R005', title:'History of Malacca Timeline', hub:'primary', type:'Notes', age:'Ages 10–12', subject:'History', desc:'Interactive notes for the Malacca Sultanate timeline.', isbn:'NOTE-HIS-MELAKA', dewey:'959.5', author:'EDUSparks History Unit', pub:'EDUSparks Digital Library, 2026', url:'', status:'active', action:'Open Notes'},
+            {id:'R006', title:'Solar System Explorer', hub:'primary', type:'Virtual Lab', age:'Ages 10–12', subject:'Science', desc:'Guided virtual lab about planets and orbit order.', isbn:'LAB-SOLAR-001', dewey:'523.2', author:'EDUSparks Science Unit', pub:'EDUSparks Digital Library, 2026', url:'', status:'active', action:'Start Lab'},
+            {id:'R007', title:'Thinking Skills Comic', hub:'secondary', type:'Comic', age:'Ages 13–17', subject:'Critical Thinking', desc:'Comic-style guide to mind mapping and scientific thinking.', isbn:'CC-THINK-001', dewey:'153.4', author:'Siyavula', pub:'Siyavula : Creative Commons, 2025', url:'https://freekidsbooks.org/thinking-skills-comic-from-siyavula/', status:'active', action:'Read Comic'},
+            {id:'R008', title:'Physics Form 4: Motion Lab', hub:'secondary', type:'Virtual Lab', age:'Ages 13–17', subject:'Physics', desc:'Guided lab for speed, acceleration, and force.', isbn:'LAB-PHY-MOTION', dewey:'531', author:'EDUSparks Science Unit', pub:'EDUSparks Digital Library, 2026', url:'', status:'active', action:'Start Lab'},
+            {id:'R009', title:'AI Literacy Starter Guide', hub:'secondary', type:'Notes', age:'Ages 13–17', subject:'Information Literacy', desc:'Teen guide to AI awareness, prompts, and source checking.', isbn:'NOTE-AI-LIT-001', dewey:'006.3', author:'EDUSparks IL Team', pub:'EDUSparks Digital Library, 2026', url:'', status:'active', action:'Read Guide'},
+            {id:'R010', title:'Sound Science Video', hub:'multimedia', type:'Video', age:'Ages 6–9', subject:'Science', desc:'MP4 learning video about sound.', isbn:'VID-SOUND-001', dewey:'534', author:'EDUSparks Multimedia Team', pub:'EDUSparks Digital Library, 2026', url:'videos/sound-science.mp4', status:'active', action:'Watch Video'}
+        ];
+        const sampleFeedback = [
+            {id:'F001', name:'Farah Aziz', email:'farah@student.edu.my', subject:'Broken link for Calculus PDF', message:'The Calculus PDF link does not open on my phone. Can the library team check it?', date:'2026-06-28 09:30', unread:true, reply:''},
+            {id:'F002', name:'Daniel Hakimi', email:'daniel@student.edu.my', subject:'Suggesting more Sci-Fi books', message:'Can EDUSparks add more teen science fiction books for secondary students?', date:'2026-06-27 14:15', unread:true, reply:''},
+            {id:'F003', name:'Ahmad Razak', email:'ahmad@student.edu.my', subject:'Thank you for the update', message:'The new collections are easier to browse. Thank you!', date:'2026-06-25 11:00', unread:false, reply:''}
+        ];
+
+        function readJSON(key, fallback){ try{ const raw=localStorage.getItem(key); return raw? JSON.parse(raw): fallback; }catch(e){ return fallback; } }
+        function writeJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+        function normalizeEmail(email){ return String(email||'').trim().toLowerCase(); }
+        function uniqueId(prefix){ return prefix + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2,5).toUpperCase(); }
+        function showToast(message){ const toast=document.getElementById('toast'); document.getElementById('toastText').textContent=message; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),2300); }
+        function openModal(id){ document.getElementById(id).classList.add('active'); }
+        function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+        function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
+        function togglePassword(inputId, btn){ const input=document.getElementById(inputId); input.type=input.type==='password'?'text':'password'; btn.innerHTML=input.type==='password'?'<i class="ph ph-eye"></i>':'<i class="ph ph-eye-slash"></i>'; }
+
+        function ensureInitialData(){
+            if(!localStorage.getItem(STORAGE.resources)) writeJSON(STORAGE.resources, sampleResources);
+            if(!localStorage.getItem(STORAGE.feedback)) writeJSON(STORAGE.feedback, sampleFeedback);
+            if(!localStorage.getItem(STORAGE.settings)) writeJSON(STORAGE.settings, {libraryName:'EDUSparks Digital Library', contactEmail:'admin@edusparks.my', phone:'+604 123 4567', maintenance:false, publicRegistration:true});
+        }
+        function getAdminAccounts(){ return readJSON(STORAGE.adminAccounts, {}); }
+        function setAdminAccounts(accounts){ writeJSON(STORAGE.adminAccounts, accounts); }
+        function getUsers(){ return readJSON(STORAGE.users, {}); }
+        function setUsers(users){ writeJSON(STORAGE.users, users); }
+        function getResources(){ return readJSON(STORAGE.resources, []); }
+        function setResources(resources){ writeJSON(STORAGE.resources, resources); }
+        function getFeedback(){ return readJSON(STORAGE.feedback, []); }
+        function setFeedback(feedback){ writeJSON(STORAGE.feedback, feedback); }
+        function getLibrary(){ return readJSON(STORAGE.library, {fav:[],later:[],done:[]}); }
+
+        document.getElementById('adminAuthForm').addEventListener('submit', handleAdminAuth);
+        document.getElementById('resourceForm').addEventListener('submit', saveResource);
+        document.getElementById('userForm').addEventListener('submit', saveUser);
+        document.getElementById('profileForm').addEventListener('submit', saveProfile);
+        document.getElementById('settingsForm').addEventListener('submit', function(e){ e.preventDefault(); saveSettingsQuick(true); });
+
+        function toggleRegisterMode(){
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('nameRow').style.display = isRegisterMode ? 'block' : 'none';
+            document.getElementById('authTitle').textContent = isRegisterMode ? 'Register New Admin' : 'Staff Access Only';
+            document.getElementById('authSub').textContent = isRegisterMode ? 'Create a staff account before signing in.' : 'Sign in with a registered EDUSparks admin account.';
+            document.getElementById('authSubmitBtn').innerHTML = isRegisterMode ? '<i class="ph ph-user-plus"></i> Create Admin Account' : '<i class="ph ph-sign-in"></i> Login to Dashboard';
+            document.getElementById('authToggleBtn').textContent = isRegisterMode ? 'Back to Login' : 'Register New Admin';
+        }
+        function handleAdminAuth(e){
+            e.preventDefault();
+            const name = document.getElementById('adminName').value.trim();
+            const email = normalizeEmail(document.getElementById('adminEmail').value);
+            const password = document.getElementById('adminPassword').value;
+            if(!email.endsWith('@edusparks.my')){ showToast('Only @edusparks.my staff email is allowed.'); return; }
+            if(password.length < 6){ showToast('Password must be at least 6 characters.'); return; }
+            const accounts = getAdminAccounts();
+            if(isRegisterMode){
+                if(accounts[email]){ showToast('This admin email already exists. Please login.'); return; }
+                accounts[email] = {name: name || email.split('@')[0], email, password, department:'IT & Library Management', createdAt:new Date().toISOString(), lastLogin:null};
+                setAdminAccounts(accounts);
+                showToast('Admin account created. Please sign in.');
+                document.getElementById('adminAuthForm').reset();
+                toggleRegisterMode();
+                return;
+            }
+            if(!accounts[email]){ showToast('No admin account found. Please register first.'); return; }
+            if(accounts[email].password !== password){ showToast('Incorrect email or password.'); return; }
+            accounts[email].lastLogin = new Date().toISOString();
+            setAdminAccounts(accounts);
+            currentAdmin = accounts[email];
+            writeJSON(STORAGE.adminSession, {email, time:new Date().toISOString()});
+            startApp();
+        }
+        function startApp(){
+            document.getElementById('authScreen').style.display='none';
+            document.getElementById('app').classList.add('active');
+            hydrateAdminUI();
+            renderAll();
+            showToast('Welcome, ' + currentAdmin.name + '!');
+        }
+        function restoreSession(){
+            ensureInitialData();
+            updateAuthMiniStats();
+            const session = readJSON(STORAGE.adminSession, null);
+            if(session && session.email){
+                const accounts = getAdminAccounts();
+                if(accounts[session.email]){ currentAdmin = accounts[session.email]; startApp(); }
+            }
+        }
+        function adminLogout(){ localStorage.removeItem(STORAGE.adminSession); currentAdmin=null; location.reload(); }
+        function hydrateAdminUI(){
+            const initial = (currentAdmin.name||'A').charAt(0).toUpperCase();
+            document.getElementById('adminAvatar').textContent=initial;
+            document.getElementById('profileBigAvatar').textContent=initial;
+            document.getElementById('topAdminName').textContent=currentAdmin.name;
+            document.getElementById('topAdminEmail').textContent=currentAdmin.email;
+            document.getElementById('profileNameView').textContent=currentAdmin.name;
+            document.getElementById('profileEmailView').textContent=currentAdmin.email;
+            document.getElementById('profileName').value=currentAdmin.name;
+            document.getElementById('profileEmail').value=currentAdmin.email;
+            document.getElementById('profileDept').value=currentAdmin.department || 'IT & Library Management';
+            loadSettingsForm();
+        }
+        function showPage(pageId, link){
+            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+            document.getElementById('page-'+pageId).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));
+            if(link) link.classList.add('active');
+            const meta = {dashboard:['Dashboard','Overview of EDUSparks Digital Library activity.'], collections:['Manage Collections','Edit resources, categories, and MARC records.'], users:['User Management','Review student accounts and access status.'], messages:['Messages / Feedback','Respond to student feedback and suggestions.'], profile:['Admin Profile','Manage staff account details.'], settings:['System Settings','Configure prototype preferences.']};
+            document.getElementById('pageTitle').textContent=meta[pageId][0];
+            document.getElementById('pageHint').textContent=meta[pageId][1];
+            document.getElementById('sidebar').classList.remove('open');
+            renderAll();
+        }
+        function renderAll(){ renderDashboard(); renderResources(); renderUsers(); renderMessages(); updateAuthMiniStats(); }
+        function updateAuthMiniStats(){
+            const users = Object.keys(getUsers()).length;
+            const resources = getResources().length;
+            const feedback = getFeedback().length;
+            const a=document.getElementById('authMiniUsers'); if(a) a.textContent=users;
+            const b=document.getElementById('authMiniResources'); if(b) b.textContent=resources;
+            const c=document.getElementById('authMiniFeedback'); if(c) c.textContent=feedback;
+        }
+        function renderDashboard(){
+            const users = getUsers(); const resources = getResources(); const feedback = getFeedback(); const lib = getLibrary();
+            document.getElementById('statUsers').textContent=Object.keys(users).length;
+            document.getElementById('statResources').textContent=resources.length;
+            document.getElementById('statReadLater').textContent=(lib.later||[]).length;
+            document.getElementById('statUnread').textContent=feedback.filter(f=>f.unread).length;
+            const counts = {early:0, primary:0, secondary:0, multimedia:0};
+            resources.forEach(r=>counts[r.hub]=(counts[r.hub]||0)+1);
+            const max = Math.max(1, ...Object.values(counts));
+            const labels = {early:'Early Hub', primary:'Primary Zone', secondary:'Secondary Portal', multimedia:'Multimedia'};
+            document.getElementById('zoneChart').innerHTML = Object.entries(counts).map(([k,v])=>`<div class="bar-row"><strong>${labels[k]}</strong><div class="bar-track"><div class="bar-fill" style="width:${(v/max)*100}%"></div></div><span class="muted">${v}</span></div>`).join('');
+        }
+        function hubLabel(hub){ return {early:'Early Hub', primary:'Primary Zone', secondary:'Secondary Portal', multimedia:'Multimedia'}[hub] || hub; }
+        function typeBadge(type){ const cls = type==='Game'?'amber': type==='Comic'?'purple': type==='Video'?'blue': type==='Virtual Lab'?'green':''; return `<span class="badge ${cls}">${type}</span>`; }
+        function statusBadge(status){ if(status==='active') return '<span class="badge green"><i class="ph ph-check-circle"></i>Active</span>'; if(status==='draft') return '<span class="badge amber">Draft</span>'; return '<span class="badge red">Archived</span>'; }
+        function renderResources(){
+            const q=(document.getElementById('resourceSearch')?.value||'').toLowerCase(); const hub=document.getElementById('hubFilter')?.value||'all'; const type=document.getElementById('typeFilter')?.value||'all';
+            let rows = getResources().filter(r=> (hub==='all'||r.hub===hub) && (type==='all'||r.type===type) && [r.title,r.author,r.subject,r.isbn,r.dewey].join(' ').toLowerCase().includes(q));
+            const tbody=document.getElementById('resourcesTable');
+            if(!rows.length){ tbody.innerHTML='<tr><td colspan="6" class="empty">No resources found.</td></tr>'; return; }
+            tbody.innerHTML = rows.map(r=>`<tr><td><div class="resource-title">${escapeHTML(r.title)}</div><div class="muted">${escapeHTML(r.age||'')} • ${escapeHTML(r.subject||'')}</div></td><td>${hubLabel(r.hub)}</td><td>${typeBadge(r.type)}</td><td><strong>020:</strong> ${escapeHTML(r.isbn||'-')}<br><strong>082:</strong> ${escapeHTML(r.dewey||'-')}<br><strong>100:</strong> ${escapeHTML(r.author||'-')}</td><td>${statusBadge(r.status)}</td><td><div class="actions"><button class="btn small" onclick="openResourceModal('${r.id}')"><i class="ph ph-pencil-simple"></i>Edit</button><button class="btn small soft" onclick="duplicateResource('${r.id}')"><i class="ph ph-copy"></i>Copy</button><button class="btn small danger" onclick="deleteResource('${r.id}')"><i class="ph ph-trash"></i></button></div></td></tr>`).join('');
+        }
+        function openResourceModal(id){
+            document.getElementById('resourceForm').reset(); document.getElementById('resId').value='';
+            document.getElementById('resourceModalTitle').textContent = id ? 'Edit Resource / MARC 21' : 'Add New Resource';
+            if(id){ const r=getResources().find(x=>x.id===id); if(r){ document.getElementById('resId').value=r.id; document.getElementById('resTitle').value=r.title||''; document.getElementById('resHub').value=r.hub||'early'; document.getElementById('resType').value=r.type||'Comic'; document.getElementById('resAge').value=r.age||''; document.getElementById('resSubject').value=r.subject||''; document.getElementById('resDesc').value=r.desc||''; document.getElementById('resIsbn').value=r.isbn||''; document.getElementById('resDewey').value=r.dewey||''; document.getElementById('resAuthor').value=r.author||''; document.getElementById('resPub').value=r.pub||''; document.getElementById('resUrl').value=r.url||''; document.getElementById('resStatus').value=r.status||'active'; document.getElementById('resAction').value=r.action||''; } }
+            openModal('resourceModal');
+        }
+        function saveResource(e){
+            e.preventDefault(); const id=document.getElementById('resId').value || uniqueId('R'); let resources=getResources();
+            const record={id, title:document.getElementById('resTitle').value.trim(), hub:document.getElementById('resHub').value, type:document.getElementById('resType').value, age:document.getElementById('resAge').value.trim(), subject:document.getElementById('resSubject').value.trim(), desc:document.getElementById('resDesc').value.trim(), isbn:document.getElementById('resIsbn').value.trim(), dewey:document.getElementById('resDewey').value.trim(), author:document.getElementById('resAuthor').value.trim(), pub:document.getElementById('resPub').value.trim(), url:document.getElementById('resUrl').value.trim(), status:document.getElementById('resStatus').value, action:document.getElementById('resAction').value.trim()};
+            const idx=resources.findIndex(r=>r.id===id); if(idx>=0) resources[idx]=record; else resources.unshift(record); setResources(resources); closeModal('resourceModal'); renderAll(); showToast('Resource saved successfully.');
+        }
+        function duplicateResource(id){ const resources=getResources(); const r=resources.find(x=>x.id===id); if(!r)return; const copy={...r,id:uniqueId('R'),title:r.title+' (Copy)',status:'draft'}; resources.unshift(copy); setResources(resources); renderAll(); showToast('Resource duplicated as draft.'); }
+        function deleteResource(id){ if(!confirm('Delete this resource?'))return; setResources(getResources().filter(r=>r.id!==id)); renderAll(); showToast('Resource deleted.'); }
+        function resetResources(){ if(confirm('Reset collections to sample data?')){ setResources(sampleResources); renderAll(); showToast('Sample collections restored.'); } }
+
+        function userProgress(email){ const lib=getLibrary(); const all=[...(lib.fav||[]),...(lib.later||[]),...(lib.done||[])]; return all.length; }
+        function renderUsers(){
+            const users=getUsers(); const q=(document.getElementById('userSearch')?.value||'').toLowerCase(); const status=document.getElementById('userStatusFilter')?.value||'all';
+            const entries=Object.entries(users).map(([email,u])=>({email,...u,status:u.status||'active'})).filter(u=>(status==='all'||u.status===status)&&[u.name,u.email].join(' ').toLowerCase().includes(q));
+            document.getElementById('userTotal').textContent=Object.keys(users).length; document.getElementById('userActive').textContent=Object.values(users).filter(u=>(u.status||'active')==='active').length; document.getElementById('userBanned').textContent=Object.values(users).filter(u=>u.status==='banned').length;
+            const tbody=document.getElementById('usersTable'); if(!entries.length){ tbody.innerHTML='<tr><td colspan="6" class="empty">No users found. Add users or sign up from the EDL website first.</td></tr>'; return; }
+            tbody.innerHTML=entries.map(u=>`<tr><td><div class="resource-title">${escapeHTML(u.name||'Student')}</div></td><td>${escapeHTML(u.email)}</td><td>${formatDate(u.createdAt)||'-'}</td><td>${u.status==='banned'?'<span class="badge red">Banned</span>':'<span class="badge green">Active</span>'}</td><td><span class="badge blue">${userProgress(u.email)} saved items</span></td><td><div class="actions"><button class="btn small" onclick="openUserModal('${u.email}')"><i class="ph ph-pencil"></i>Edit</button><button class="btn small ${u.status==='banned'?'success':'danger'}" onclick="toggleUserBan('${u.email}')">${u.status==='banned'?'Unban':'Ban'}</button><button class="btn small ghost" onclick="deleteUser('${u.email}')"><i class="ph ph-trash"></i></button></div></td></tr>`).join('');
+        }
+        function openUserModal(email){
+            document.getElementById('userForm').reset(); document.getElementById('userOriginalEmail').value=''; document.getElementById('userModalTitle').textContent=email?'Edit User':'Add User'; document.getElementById('userPassword').required=!email;
+            if(email){ const u=getUsers()[email]; if(u){ document.getElementById('userOriginalEmail').value=email; document.getElementById('userName').value=u.name||''; document.getElementById('userEmail').value=email; document.getElementById('userPassword').value=''; document.getElementById('userStatus').value=u.status||'active'; } }
+            openModal('userModal');
+        }
+        function saveUser(e){
+            e.preventDefault(); const original=document.getElementById('userOriginalEmail').value; const email=normalizeEmail(document.getElementById('userEmail').value); const password=document.getElementById('userPassword').value; const users=getUsers();
+            if(!original && password.length<6){ showToast('New user password must be at least 6 characters.'); return; }
+            if(!original && users[email]){ showToast('This user email already exists.'); return; }
+            const existing=original?users[original]:{}; if(original && original!==email) delete users[original];
+            users[email]={name:document.getElementById('userName').value.trim(), email, password:password||existing.password||'student123', status:document.getElementById('userStatus').value, createdAt:existing.createdAt||new Date().toISOString()};
+            setUsers(users); closeModal('userModal'); renderAll(); showToast('User saved successfully.');
+        }
+        function toggleUserBan(email){ const users=getUsers(); if(!users[email])return; users[email].status=users[email].status==='banned'?'active':'banned'; setUsers(users); renderAll(); showToast('User status updated.'); }
+        function deleteUser(email){ if(!confirm('Delete this user account?'))return; const users=getUsers(); delete users[email]; setUsers(users); renderAll(); showToast('User deleted.'); }
+
+        function renderMessages(){
+            const list=document.getElementById('messagesList'); const feedback=getFeedback().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+            if(!feedback.length){ list.innerHTML='<div class="card empty">No feedback messages yet.</div>'; return; }
+            list.innerHTML=feedback.map(f=>`<div class="message-card ${f.unread?'unread':''}"><div><h3>${escapeHTML(f.subject)}</h3><p class="muted">From <strong>${escapeHTML(f.name)}</strong> • ${escapeHTML(f.email)} • ${escapeHTML(f.date)}</p><p style="margin-top:10px;line-height:1.6">${escapeHTML(f.message).slice(0,170)}${f.message.length>170?'...':''}</p>${f.reply?`<p style="margin-top:10px"><span class="badge green"><i class="ph ph-reply"></i> Reply note saved</span></p>`:''}</div><div class="actions"><button class="btn small" onclick="viewMessage('${f.id}')">View</button><button class="btn small ghost" onclick="toggleMessageRead('${f.id}')">${f.unread?'Mark Read':'Unread'}</button><button class="btn small danger" onclick="deleteMessage('${f.id}')"><i class="ph ph-trash"></i></button></div></div>`).join('');
+        }
+        function viewMessage(id){ const f=getFeedback().find(x=>x.id===id); if(!f)return; currentMessageId=id; f.unread=false; setFeedback(getFeedback().map(x=>x.id===id?f:x)); document.getElementById('messageModalBody').innerHTML=`<div class="form-grid"><div><label>Name</label><input value="${escapeAttr(f.name)}" readonly></div><div><label>Email</label><input value="${escapeAttr(f.email)}" readonly></div><div class="full"><label>Subject</label><input value="${escapeAttr(f.subject)}" readonly></div><div class="full"><label>Message</label><textarea rows="5" readonly>${escapeHTML(f.message)}</textarea></div><div class="full"><label>Admin Reply Note</label><textarea id="replyNote" rows="4" placeholder="Write a reply note for record keeping...">${escapeHTML(f.reply||'')}</textarea></div></div>`; openModal('messageModal'); renderAll(); }
+        function saveReplyNote(){ if(!currentMessageId)return; const note=document.getElementById('replyNote').value; setFeedback(getFeedback().map(f=>f.id===currentMessageId?{...f,reply:note,unread:false}:f)); closeModal('messageModal'); renderAll(); showToast('Reply note saved.'); }
+        function toggleMessageRead(id){ setFeedback(getFeedback().map(f=>f.id===id?{...f,unread:!f.unread}:f)); renderAll(); }
+        function deleteMessage(id){ if(!confirm('Delete this feedback?'))return; setFeedback(getFeedback().filter(f=>f.id!==id)); renderAll(); showToast('Feedback deleted.'); }
+        function addDemoFeedback(){ const names=['Aina Sofea','Hakim Danish','Mei Ling','Arif Haziq']; const subjects=['Request more comics','Video cannot play','Need Malay notes','Great new collection']; const i=Math.floor(Math.random()*names.length); const f={id:uniqueId('F'),name:names[i],email:names[i].toLowerCase().replaceAll(' ','.')+'@student.edu.my',subject:subjects[i],message:'This is sample feedback for testing the admin dashboard function. Admin can mark it as read, save a reply note, or delete it.',date:new Date().toISOString().slice(0,16).replace('T',' '),unread:true,reply:''}; const feedback=getFeedback(); feedback.unshift(f); setFeedback(feedback); renderAll(); showToast('Demo feedback added.'); }
+
+        function saveProfile(e){
+            e.preventDefault(); const name=document.getElementById('profileName').value.trim(); const email=normalizeEmail(document.getElementById('profileEmail').value); const dept=document.getElementById('profileDept').value.trim(); const p1=document.getElementById('profilePass').value; const p2=document.getElementById('profilePass2').value;
+            if(!email.endsWith('@edusparks.my')){ showToast('Admin email must use @edusparks.my'); return; }
+            if(p1 && p1!==p2){ showToast('Passwords do not match.'); return; }
+            if(p1 && p1.length<6){ showToast('New password must be at least 6 characters.'); return; }
+            const accounts=getAdminAccounts(); const oldEmail=currentAdmin.email; const updated={...currentAdmin,name,email,department:dept}; if(p1) updated.password=p1; if(oldEmail!==email) delete accounts[oldEmail]; accounts[email]=updated; setAdminAccounts(accounts); currentAdmin=updated; writeJSON(STORAGE.adminSession,{email,time:new Date().toISOString()}); hydrateAdminUI(); document.getElementById('profilePass').value=''; document.getElementById('profilePass2').value=''; showToast('Profile updated.');
+        }
+        function loadSettingsForm(){ const s=readJSON(STORAGE.settings,{}); document.getElementById('setLibraryName').value=s.libraryName||'EDUSparks Digital Library'; document.getElementById('setContactEmail').value=s.contactEmail||'admin@edusparks.my'; document.getElementById('setPhone').value=s.phone||'+604 123 4567'; document.getElementById('setMaintenance').checked=!!s.maintenance; document.getElementById('setPublicReg').checked=s.publicRegistration!==false; }
+        function saveSettingsQuick(show=true){ const s={libraryName:document.getElementById('setLibraryName').value, contactEmail:document.getElementById('setContactEmail').value, phone:document.getElementById('setPhone').value, maintenance:document.getElementById('setMaintenance').checked, publicRegistration:document.getElementById('setPublicReg').checked}; writeJSON(STORAGE.settings,s); if(show) showToast('Settings saved.'); }
+        function seedSampleData(){ ensureInitialData(); const users=getUsers(); if(Object.keys(users).length===0){ users['ahmad@student.edu.my']={name:'Ahmad Bin Razak',email:'ahmad@student.edu.my',password:'student123',status:'active',createdAt:'2026-01-12T08:00:00.000Z'}; users['siti@student.edu.my']={name:'Siti Nurhaliza',email:'siti@student.edu.my',password:'student123',status:'banned',createdAt:'2026-02-05T08:00:00.000Z'}; setUsers(users); } renderAll(); showToast('Sample data ready.'); }
+        function clearPrototypeData(){ if(!confirm('Clear resources, feedback, settings, and users from this browser? Admin account will remain.'))return; [STORAGE.resources,STORAGE.feedback,STORAGE.settings,STORAGE.users,STORAGE.library].forEach(k=>localStorage.removeItem(k)); ensureInitialData(); renderAll(); loadSettingsForm(); showToast('Prototype data cleared and reset.'); }
+        function exportAllData(){ const data={admin:getAdminAccounts(), users:getUsers(), resources:getResources(), feedback:getFeedback(), settings:readJSON(STORAGE.settings,{})}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='edusparks-admin-export.json'; a.click(); URL.revokeObjectURL(a.href); showToast('Export downloaded.'); }
+        function formatDate(iso){ if(!iso)return ''; try{ return new Date(iso).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }catch(e){ return iso; } }
+        function escapeHTML(str){ return String(str||'').replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+        function escapeAttr(str){ return escapeHTML(str).replace(/'/g,'&#39;'); }
+        restoreSession();
+    </script>
+</body>
+</html>
